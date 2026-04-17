@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arc | Launch Readiness</title>
+<style>
+:root {
+  --navy:#020434;--navy-mid:#0a0f52;--pink:#E60F65;--pink-light:#fce8f0;
+  --lavender:#EDF0FA;--white:#FFFFFF;--light-gray:#F4F5F9;--border:#D8DCE8;
+  --text-dark:#1A1D3A;--text-mid:#4A4F6B;--text-light:#8B91AA;
+  --green:#22c55e;--green-light:#f0fdf4;--yellow:#f59e0b;--yellow-light:#fffbeb;
+  --gray:#9ca3af;--gray-light:#f9fafb;--red:#ef4444;--red-light:#fef2f2;
+  --blue:#3b82f6;--blue-light:#eff6ff;
+  --chart-1:#E60F65;--chart-2:#020434;--chart-3:#6C7BB5;--chart-4:#A8B0D4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--lavender);color:var(--text-dark);min-height:100vh;overflow-x:hidden}
+
+/* TOP NAV */
+.topnav{background:var(--navy);height:56px;display:flex;align-items:center;padding:0 20px;position:fixed;top:0;left:0;right:0;z-index:1000;gap:16px;box-shadow:0 2px 8px rgba(2,4,52,0.4)}
+.topnav-brand{display:flex;align-items:center;gap:10px}
+.topnav-logo{width:24px;height:24px;flex-shrink:0}
+.topnav-title{color:#fff;font-size:15px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.topnav-module{color:rgba(255,255,255,0.5);font-size:14px;margin-left:2px}
+.topnav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.topnav-client{background:rgba(255,255,255,0.1);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.topnav-user{display:flex;align-items:center;gap:8px;color:#fff;font-size:13px}
+.topnav-avatar{width:30px;height:30px;border-radius:50%;background:var(--pink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff}
+.topnav-notif{color:rgba(255,255,255,0.6);font-size:16px;cursor:pointer;position:relative}
+.notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--pink);border-radius:50%;border:2px solid var(--navy)}
+
+/* SIDEBAR */
+.sidebar{width:230px;background:var(--navy);position:fixed;top:56px;left:0;bottom:0;overflow-y:auto;z-index:900;padding:12px 0}
+.sidebar-section{padding:8px 0}
+.sidebar-label{color:rgba(255,255,255,0.35);font-size:10px;font-weight:700;letter-spacing:1.2px;padding:8px 20px 4px;text-transform:uppercase}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 20px;color:rgba(255,255,255,0.65);font-size:13px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;position:relative}
+.sidebar-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.sidebar-item.active{background:rgba(230,15,101,0.15);color:#fff;border-left-color:var(--pink)}
+.sidebar-item .icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.sidebar-item .ws-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-left:auto}
+.sidebar-item .ws-dot.green{background:var(--green)}
+.sidebar-item .ws-dot.yellow{background:var(--yellow)}
+.sidebar-item .ws-dot.gray{background:var(--gray)}
+.sidebar-item .ws-dot.red{background:var(--red)}
+.sidebar-divider{height:1px;background:rgba(255,255,255,0.08);margin:6px 16px}
+
+/* MAIN */
+.main{margin-left:230px;margin-top:56px;min-height:calc(100vh - 56px);padding:24px}
+
+/* PAGE HEADERS */
+.page-header{margin-bottom:20px}
+.page-title{font-size:22px;font-weight:700;color:var(--text-dark);margin-bottom:4px}
+.page-subtitle{font-size:13px;color:var(--text-light)}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:700;color:var(--text-dark)}
+.card-body{padding:20px}
+
+/* KPI TILES */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.kpi-tile{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden}
+.kpi-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--pink)}
+.kpi-tile.green::before{background:var(--green)}
+.kpi-tile.yellow::before{background:var(--yellow)}
+.kpi-tile.blue::before{background:var(--blue)}
+.kpi-label{font-size:11px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.kpi-value{font-size:28px;font-weight:800;color:var(--text-dark);line-height:1}
+.kpi-sub{font-size:12px;color:var(--text-light);margin-top:6px}
+.kpi-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:8px}
+.kpi-badge.green{background:var(--green-light);color:#16a34a}
+.kpi-badge.yellow{background:var(--yellow-light);color:#d97706}
+.kpi-badge.red{background:var(--red-light);color:#dc2626}
+.kpi-icon{font-size:24px;position:absolute;right:16px;top:50%;transform:translateY(-50%);opacity:.15}
+
+/* SECTION GRIDS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+.full-width{margin-bottom:20px}
+
+/* WORKSTREAM GRID */
+.ws-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.ws-card{border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .15s;background:#fff;position:relative}
+.ws-card:hover{border-color:var(--pink);box-shadow:0 2px 8px rgba(230,15,101,0.1);transform:translateY(-1px)}
+.ws-card-name{font-size:12px;font-weight:600;color:var(--text-dark);margin-bottom:8px;line-height:1.3}
+.ws-card-status{font-size:11px;color:var(--text-light);margin-bottom:10px}
+.ws-progress-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.ws-progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.ws-card-footer{display:flex;align-items:center;justify-content:space-between}
+.ws-health-dot{width:10px;height:10px;border-radius:50%}
+.ws-health-dot.green{background:var(--green)}
+.ws-health-dot.yellow{background:var(--yellow)}
+.ws-health-dot.gray{background:var(--gray)}
+.ws-health-dot.red{background:var(--red)}
+.ws-task-count{font-size:10px;color:var(--text-light)}
+
+/* MILESTONE TIMELINE */
+.milestone-track{position:relative;padding:20px 0}
+.milestone-line{position:absolute;left:0;right:0;top:50%;height:3px;background:var(--border);z-index:0;top:36px}
+.milestone-progress-line{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--green),var(--pink));z-index:1;top:36px;transition:width 1s}
+.milestone-items{display:flex;justify-content:space-between;position:relative;z-index:2}
+.milestone-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.milestone-dot{width:16px;height:16px;border-radius:50%;border:3px solid;transition:transform .2s;cursor:pointer}
+.milestone-dot:hover{transform:scale(1.3)}
+.milestone-dot.complete{background:var(--green);border-color:var(--green)}
+.milestone-dot.current{background:#fff;border-color:var(--pink);box-shadow:0 0 0 4px rgba(230,15,101,0.2);animation:pulse 2s infinite}
+.milestone-dot.future{background:#fff;border-color:var(--border)}
+.milestone-label{font-size:10px;font-weight:600;color:var(--text-mid);text-align:center;max-width:80px}
+.milestone-date{font-size:10px;color:var(--text-light);text-align:center}
+.milestone-days{font-size:11px;font-weight:700;color:var(--pink)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(230,15,101,0.2)}50%{box-shadow:0 0 0 8px rgba(230,15,101,0.05)}}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge.green{background:var(--green-light);color:#16a34a}
+.badge.yellow{background:var(--yellow-light);color:#d97706}
+.badge.gray{background:var(--gray-light);color:#6b7280}
+.badge.red{background:var(--red-light);color:#dc2626}
+.badge.blue{background:var(--blue-light);color:#2563eb}
+.badge.navy{background:rgba(2,4,52,0.08);color:var(--navy)}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--text-light);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--text-dark)}
+.tab.active{color:var(--pink);border-bottom-color:var(--pink)}
+
+/* TABLES */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;background:var(--light-gray);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text-dark);vertical-align:middle}
+tr:hover td{background:var(--lavender)}
+tr.clickable{cursor:pointer}
+tr.clickable:hover td{background:rgba(230,15,101,0.04)}
+.td-activity{font-weight:600;max-width:280px}
+.td-light{color:var(--text-light)}
+.td-tag{font-size:11px;padding:2px 8px;background:var(--lavender);color:var(--text-mid);border-radius:4px;display:inline-block}
+
+/* GANTT */
+.gantt-wrap{overflow-x:auto;padding-bottom:10px}
+.gantt-header{display:flex;border-bottom:2px solid var(--border);padding-bottom:8px;margin-bottom:8px}
+.gantt-label-col{width:180px;flex-shrink:0;font-size:11px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;padding-left:4px}
+.gantt-timeline-header{flex:1;display:flex;position:relative;min-width:600px}
+.gantt-month{flex:1;font-size:10px;font-weight:600;color:var(--text-light);text-align:center;border-right:1px dashed var(--border)}
+.gantt-row{display:flex;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
+.gantt-row-label{width:180px;flex-shrink:0;font-size:12px;color:var(--text-dark);padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-weight:500}
+.gantt-row-label:hover{color:var(--pink)}
+.gantt-row-label.parent{font-weight:700;color:var(--text-dark)}
+.gantt-timeline{flex:1;height:20px;position:relative;min-width:600px}
+.gantt-bar{position:absolute;height:14px;top:3px;border-radius:4px;min-width:4px;transition:opacity .2s;cursor:pointer}
+.gantt-bar:hover{opacity:.8}
+.gantt-bar.green{background:linear-gradient(90deg,#22c55e,#16a34a)}
+.gantt-bar.yellow{background:linear-gradient(90deg,#f59e0b,#d97706)}
+.gantt-bar.gray{background:linear-gradient(90deg,#9ca3af,#6b7280)}
+.gantt-bar.blue{background:linear-gradient(90deg,#3b82f6,#2563eb)}
+.gantt-milestone{position:absolute;width:12px;height:12px;background:var(--navy);transform:rotate(45deg);top:4px;z-index:2;cursor:pointer}
+.gantt-milestone:hover::after{content:attr(data-label);position:absolute;bottom:16px;left:50%;transform:translateX(-50%) rotate(-45deg);background:var(--navy);color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;white-space:nowrap;z-index:10}
+.gantt-today{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--pink);z-index:3}
+.gantt-today-label{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--pink);font-weight:700;white-space:nowrap}
+
+/* DRILL DOWN PANEL */
+.drill-panel{position:fixed;top:56px;right:0;bottom:0;width:480px;background:#fff;border-left:1px solid var(--border);z-index:800;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto}
+.drill-panel.open{transform:translateX(0)}
+.drill-header{background:var(--navy);color:#fff;padding:20px 24px;position:sticky;top:0;z-index:2}
+.drill-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.drill-sub{font-size:12px;color:rgba(255,255,255,0.6)}
+.drill-close{position:absolute;right:20px;top:20px;color:rgba(255,255,255,0.6);cursor:pointer;font-size:18px;line-height:1}
+.drill-close:hover{color:#fff}
+.drill-body{padding:20px}
+.drill-section{margin-bottom:20px}
+.drill-section-title{font-size:11px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.drill-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.drill-stat{background:var(--light-gray);border-radius:8px;padding:12px;text-align:center}
+.drill-stat-val{font-size:20px;font-weight:800;color:var(--text-dark)}
+.drill-stat-lbl{font-size:10px;color:var(--text-light);margin-top:2px}
+.drill-task{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.drill-task:hover{border-color:var(--pink);background:var(--pink-light)}
+.drill-task-name{font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:4px}
+.drill-task-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.drill-task-detail{font-size:12px;color:var(--text-mid);margin-top:6px;line-height:1.5;padding-top:6px;border-top:1px solid var(--border)}
+.drill-assignee{font-size:11px;color:var(--text-light);display:flex;align-items:center;gap:4px}
+
+/* RISK ITEMS */
+.risk-item{border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;border-left:4px solid var(--yellow);cursor:pointer;transition:all .15s;background:#fff}
+.risk-item:hover{box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.risk-item.high{border-left-color:var(--red)}
+.risk-item.low{border-left-color:var(--green)}
+.risk-name{font-size:13px;font-weight:700;color:var(--text-dark);margin-bottom:4px}
+.risk-ws{font-size:11px;color:var(--text-light)}
+.risk-desc{font-size:12px;color:var(--text-mid);margin-top:6px;line-height:1.5}
+
+/* SYSTEMS ROADMAP */
+.sysmap-wrap{overflow-x:auto}
+.sysmap-grid{min-width:900px}
+.sysmap-header{display:flex;align-items:center;border-bottom:2px solid var(--border);padding-bottom:10px;margin-bottom:8px}
+.sysmap-func-col{width:160px;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase}
+.sysmap-sys-col{width:140px;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase}
+.sysmap-timeline{flex:1;display:grid;grid-template-columns:repeat(8,1fr)}
+.sysmap-q{font-size:10px;font-weight:700;text-align:center;color:var(--text-light);padding:4px 2px;border-right:1px solid var(--border)}
+.sysmap-row{display:flex;align-items:center;border-bottom:1px solid var(--border);padding:4px 0;min-height:32px}
+.sysmap-func{width:160px;flex-shrink:0;font-size:11px;font-weight:700;color:var(--navy);padding:2px 4px}
+.sysmap-sys{width:140px;flex-shrink:0;font-size:11px;color:var(--text-dark);padding:2px 4px}
+.sysmap-bars{flex:1;display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:3px 0}
+.sysmap-cell{border-radius:3px;height:22px;opacity:.85;position:relative;cursor:pointer}
+.sysmap-cell:hover{opacity:1;transform:scaleY(1.1)}
+.sysmap-cell.req{background:#dbeafe}
+.sysmap-cell.sel{background:#fce7f3}
+.sysmap-cell.con{background:#fef3c7}
+.sysmap-cell.imp{background:#3b82f6}
+.sysmap-cell.hyp{background:#22c55e}
+.sysmap-cell.empty{}
+.sysmap-milestone-line{border-left:2px solid var(--navy);position:absolute;top:0;bottom:0;z-index:5;opacity:.3}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.filter-select{border:1px solid var(--border);background:#fff;padding:7px 12px;border-radius:6px;font-size:12px;color:var(--text-dark);cursor:pointer;outline:none}
+.filter-select:focus{border-color:var(--pink)}
+.filter-btn{padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--text-mid);transition:all .15s}
+.filter-btn:hover,.filter-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.search-input{border:1px solid var(--border);background:#fff;padding:7px 12px 7px 32px;border-radius:6px;font-size:12px;color:var(--text-dark);outline:none;width:200px;position:relative}
+.search-wrap{position:relative}
+.search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;z-index:1}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block}
+
+/* PROGRESS RING */
+.progress-ring-wrap{display:flex;align-items:center;justify-content:center;gap:20px;padding:16px 0}
+.ring-container{position:relative;width:80px;height:80px}
+.ring-label{text-align:center;margin-top:6px;font-size:11px;color:var(--text-mid);font-weight:600}
+
+/* ALERT BANNER */
+.alert-banner{background:var(--yellow-light);border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;margin-bottom:16px}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-content-text{font-size:12px;color:#92400e;line-height:1.5}
+.alert-title{font-weight:700;display:block;margin-bottom:2px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(2,4,52,0.5);z-index:2000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:12px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.modal-header{background:var(--navy);color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:start}
+.modal-title{font-size:16px;font-weight:700}
+.modal-close{color:rgba(255,255,255,0.6);cursor:pointer;font-size:20px;line-height:1}
+.modal-body{padding:24px}
+.modal-field{margin-bottom:16px}
+.modal-field-label{font-size:11px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.modal-field-value{font-size:13px;color:var(--text-dark);line-height:1.5}
+.modal-divider{height:1px;background:var(--border);margin:16px 0}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* TOOLTIP */
+.tooltip-wrap{position:relative}
+.tooltip-wrap:hover .tooltip{display:block}
+.tooltip{display:none;position:absolute;bottom:calc(100%+6px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:6px 10px;border-radius:5px;font-size:11px;white-space:nowrap;z-index:100}
+.tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{width:60px}
+  .sidebar-item span,.sidebar-label,.ws-dot-lbl{display:none}
+  .main{margin-left:60px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .ws-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ANIMATIONS */
+.fade-in{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* HEALTH INDICATORS in sidebar for workstreams */
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-brand">
+    <svg class="topnav-logo" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L3 7v10l9 5 9-5V7L12 2z" fill="#E60F65" opacity=".9"/>
+      <path d="M12 2v20M3 7l9 5M21 7l-9 5" stroke="#fff" stroke-width="1.2" opacity=".6"/>
+    </svg>
+    <span class="topnav-title">Arc</span>
+    <span class="topnav-module">| Launch Readiness</span>
+  </div>
+  <div class="topnav-right">
+    <span class="topnav-client">Merus Oncology</span>
+    <div class="topnav-notif tooltip-wrap">
+      🔔
+      <div class="notif-dot"></div>
+      <div class="tooltip">3 items need attention</div>
+    </div>
+    <div class="topnav-user">
+      <div class="topnav-avatar">JH</div>
+      <span>Jennifer Herritz</span>
+    </div>
+  </div>
+</nav>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main Views</div>
+    <div class="sidebar-item active" onclick="showView('dashboard')" id="nav-dashboard">
+      <span class="icon">📊</span><span>Executive Dashboard</span>
+    </div>
+    <div class="sidebar-item" onclick="showView('timeline')" id="nav-timeline">
+      <span class="icon">📅</span><span>Program Timeline</span>
+    </div>
+    <div class="sidebar-item" onclick="showView('workstreams')" id="nav-workstreams">
+      <span class="icon">🗂️</span><span>Workstreams</span>
+    </div>
+    <div class="sidebar-item" onclick="showView('systems')" id="nav-systems">
+      <span class="icon">⚙️</span><span>Systems Roadmap</span>
+    </div>
+    <div class="sidebar-item" onclick="showView('risks')" id="nav-risks">
+      <span class="icon">⚠️</span><span>Risk Registry</span>
+    </div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Workstreams</div>
+    <div class="sidebar-item" onclick="showWorkstream('Regulatory')">
+      <span class="icon">📋</span><span>Regulatory</span>
+      <div class="ws-dot green"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Medical Affairs')">
+      <span class="icon">🔬</span><span>Medical Affairs</span>
+      <div class="ws-dot green"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Commercial Operations')">
+      <span class="icon">📈</span><span>Comm Ops</span>
+      <div class="ws-dot yellow"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Market Access')">
+      <span class="icon">💊</span><span>Market Access</span>
+      <div class="ws-dot green"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Sales and Sales Training')">
+      <span class="icon">🎯</span><span>Sales & Training</span>
+      <div class="ws-dot green"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Marketing')">
+      <span class="icon">📣</span><span>Marketing</span>
+      <div class="ws-dot yellow"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Finance & Accounting')">
+      <span class="icon">💰</span><span>Finance</span>
+      <div class="ws-dot green"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Information Technology')">
+      <span class="icon">💻</span><span>IT</span>
+      <div class="ws-dot green"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Human Resources')">
+      <span class="icon">👥</span><span>HR</span>
+      <div class="ws-dot yellow"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Supply Chain')">
+      <span class="icon">🚚</span><span>Supply Chain</span>
+      <div class="ws-dot yellow"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Quality')">
+      <span class="icon">✅</span><span>Quality</span>
+      <div class="ws-dot green"></div>
+    </div>
+    <div class="sidebar-item" onclick="showWorkstream('Legal & Compliance')">
+      <span class="icon">⚖️</span><span>Legal</span>
+      <div class="ws-dot yellow"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- ═══ DASHBOARD VIEW ═══ -->
+<div class="view active fade-in" id="view-dashboard">
+  <div class="page-header">
+    <div class="page-title">Launch Readiness Dashboard</div>
+    <div class="page-subtitle">Palazestrant (palazestrant) · Target PDUFA: September 1, 2027 · Last updated April 17, 2026</div>
+  </div>
+
+  <!-- ALERT -->
+  <div class="alert-banner">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-content-text">
+      <span class="alert-title">4 Workstreams Require Attention</span>
+      Commercial Operations, Marketing, Human Resources, and Legal &amp; Compliance are flagged Yellow. Commercial Data Platform vendor selection is pending.
+    </div>
+  </div>
+
+  <!-- KPI TILES -->
+  <div class="kpi-grid">
+    <div class="kpi-tile blue">
+      <div class="kpi-icon">📅</div>
+      <div class="kpi-label">Days to PDUFA</div>
+      <div class="kpi-value" id="days-to-pdufa">502</div>
+      <div class="kpi-sub">Target: September 1, 2027</div>
+      <div class="kpi-badge blue">▶ On Track</div>
+    </div>
+    <div class="kpi-tile green">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-label">Overall Health</div>
+      <div class="kpi-value">73%</div>
+      <div class="kpi-sub">11 of 15 workstreams green</div>
+      <div class="kpi-badge green">↑ Stable</div>
+    </div>
+    <div class="kpi-tile yellow">
+      <div class="kpi-icon">⚠️</div>
+      <div class="kpi-label">At-Risk Items</div>
+      <div class="kpi-value">18</div>
+      <div class="kpi-sub">Across 4 workstreams</div>
+      <div class="kpi-badge yellow">↕ Monitor</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-icon">🗂️</div>
+      <div class="kpi-label">Total Initiatives</div>
+      <div class="kpi-value">975</div>
+      <div class="kpi-sub">52 HR impact · 82 IT impact</div>
+      <div class="kpi-badge navy">Active</div>
+    </div>
+  </div>
+
+  <!-- MILESTONE BANNER + WORKSTREAM GRID -->
+  <div class="two-col">
+    <!-- Milestone Track -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🚩 Launch Milestones</div>
+        <span class="badge blue">6 Gates</span>
+      </div>
+      <div class="card-body">
+        <div class="milestone-track">
+          <div class="milestone-line"></div>
+          <div class="milestone-progress-line" style="width:18%"></div>
+          <div class="milestone-items">
+            <div class="milestone-item tooltip-wrap" onclick="openMilestoneModal('topline')">
+              <div class="milestone-dot future" style="border-color:#6C7BB5"></div>
+              <div class="milestone-label">Topline Data</div>
+              <div class="milestone-date">Aug 10, 2026</div>
+              <div class="milestone-days" style="color:#6C7BB5">~116d</div>
+            </div>
+            <div class="milestone-item" onclick="openMilestoneModal('bla')">
+              <div class="milestone-dot future"></div>
+              <div class="milestone-label">BLA Submission</div>
+              <div class="milestone-date">Dec 31, 2026</div>
+              <div class="milestone-days">~258d</div>
+            </div>
+            <div class="milestone-item" onclick="openMilestoneModal('acceptance')">
+              <div class="milestone-dot future"></div>
+              <div class="milestone-label">File Acceptance</div>
+              <div class="milestone-date">Mar 1, 2027</div>
+              <div class="milestone-days">~318d</div>
+            </div>
+            <div class="milestone-item" onclick="openMilestoneModal('sales')">
+              <div class="milestone-dot future"></div>
+              <div class="milestone-label">Sales Onboard</div>
+              <div class="milestone-date">Jun 9, 2027</div>
+              <div class="milestone-days">~418d</div>
+            </div>
+            <div class="milestone-item" onclick="openMilestoneModal('readiness')">
+              <div class="milestone-dot future"></div>
+              <div class="milestone-label">Launch Readiness</div>
+              <div class="milestone-date">Aug 1, 2027</div>
+              <div class="milestone-days">~471d</div>
+            </div>
+            <div class="milestone-item" onclick="openMilestoneModal('pdufa')">
+              <div class="milestone-dot current"></div>
+              <div class="milestone-label">PDUFA</div>
+              <div class="milestone-date">Sep 1, 2027</div>
+              <div class="milestone-days" style="color:var(--pink)">🎯 502d</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:16px">
+          <div style="text-align:center;flex:1">
+            <div style="font-size:18px;font-weight:800;color:var(--navy)">116</div>
+            <div style="font-size:10px;color:var(--text-light)">Days to Topline</div>
+          </div>
+          <div style="text-align:center;flex:1">
+            <div style="font-size:18px;font-weight:800;color:var(--text-dark)">Q3 2026</div>
+            <div style="font-size:10px;color:var(--text-light)">Next Major Gate</div>
+          </div>
+          <div style="text-align:center;flex:1">
+            <div style="font-size:18px;font-weight:800;color:var(--pink)">1 PDUFA</div>
+            <div style="font-size:10px;color:var(--text-light)">Active FDA Review</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health by Function -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📊 Functional Health Overview</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:10px;color:var(--text-light);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>Green</span>
+          <span style="font-size:10px;color:var(--text-light);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--yellow);display:inline-block"></span>Yellow</span>
+        </div>
+      </div>
+      <div class="card-body" style="padding:12px">
+        <div id="health-bars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKSTREAM GRID -->
+  <div class="card full-width">
+    <div class="card-header">
+      <div class="card-title">🗂️ Workstream Status — Single Pane of Glass</div>
+      <div style="display:flex;gap:8px">
+        <button class="filter-btn active" onclick="filterWS('all',this)">All</button>
+        <button class="filter-btn" onclick="filterWS('yellow',this)">⚠️ At Risk</button>
+        <button class="filter-btn" onclick="filterWS('green',this)">✅ On Track</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="ws-grid" id="ws-grid"></div>
+    </div>
+  </div>
+
+  <!-- RECENT UPDATES TABLE -->
+  <div class="card full-width">
+    <div class="card-header">
+      <div class="card-title">📝 Recent Activity & Updates</div>
+      <span class="badge blue">This Period</span>
+    </div>
+    <div class="card-body" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Workstream</th><th>Activity</th><th>Owner</th><th>Update</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr class="clickable" onclick="showWorkstream('Regulatory')">
+              <td><span class="td-tag">Regulatory</span></td>
+              <td class="td-activity">BLA Submission</td>
+              <td class="td-light">Penny Ng</td>
+              <td style="font-size:12px;color:var(--text-mid);max-width:250px">Potential to submit on 15-Dec-26. CMC PPQ Feedback received.</td>
+              <td><span class="badge green">In Progress</span></td>
+            </tr>
+            <tr class="clickable" onclick="showWorkstream('Regulatory')">
+              <td><span class="td-tag">Regulatory</span></td>
+              <td class="td-activity">Regulatory Ad/Promo Review</td>
+              <td class="td-light">Penny Ng</td>
+              <td style="font-size:12px;color:var(--text-mid);max-width:250px">Following up on 2026 budget implications for AdPromo contractor.</td>
+              <td><span class="badge yellow">Monitoring</span></td>
+            </tr>
+            <tr class="clickable" onclick="showWorkstream('Commercial Operations')">
+              <td><span class="td-tag">Comm Ops</span></td>
+              <td class="td-activity">Commercial Data Platform — Vendor Selection</td>
+              <td class="td-light">MOO</td>
+              <td style="font-size:12px;color:var(--text-mid);max-width:250px">CDW/MDM/Analytics vendor evaluation underway. Decision on RFP process pending.</td>
+              <td><span class="badge yellow">At Risk</span></td>
+            </tr>
+            <tr class="clickable" onclick="showWorkstream('Medical Affairs')">
+              <td><span class="td-tag">Med Affairs</span></td>
+              <td class="td-activity">HEOR / Evidence Generation</td>
+              <td class="td-light">Jennifer Herritz</td>
+              <td style="font-size:12px;color:var(--text-mid);max-width:250px">RACI under definition. Part of Ashfield workstream; pre-AMCP dossier prep Q1.</td>
+              <td><span class="badge green">In Progress</span></td>
+            </tr>
+            <tr class="clickable" onclick="showWorkstream('Market Access')">
+              <td><span class="td-tag">Market Access</span></td>
+              <td class="td-activity">Team Build</td>
+              <td class="td-light">Loreen D.</td>
+              <td style="font-size:12px;color:var(--text-mid);max-width:250px">Genmab-owned hiring process. Integration planning underway.</td>
+              <td><span class="badge navy">Genmab Owned</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TIMELINE VIEW ═══ -->
+<div class="view fade-in" id="view-timeline">
+  <div class="page-header">
+    <div class="page-title">Program Timeline</div>
+    <div class="page-subtitle">Integrated cross-functional Gantt view · Q3 2025 – Q4 2027</div>
+  </div>
+  <div class="filter-bar">
+    <select class="filter-select" onchange="filterGanttWS(this.value)">
+      <option value="all">All Workstreams</option>
+      <option value="Regulatory">Regulatory</option>
+      <option value="Medical Affairs">Medical Affairs</option>
+      <option value="Commercial Operations">Commercial Operations</option>
+      <option value="Market Access">Market Access</option>
+      <option value="Sales and Sales Training">Sales &amp; Training</option>
+      <option value="Marketing">Marketing</option>
+      <option value="Finance &amp; Accounting">Finance</option>
+      <option value="Information Technology">IT</option>
+      <option value="Human Resources">HR</option>
+      <option value="Supply Chain">Supply Chain</option>
+    </select>
+    <button class="filter-btn" onclick="toggleGanttDetail()">Toggle Detail</button>
+    <span style="font-size:12px;color:var(--text-light);margin-left:8px">Click any bar to drill into workstream</span>
+  </div>
+  <div class="card full-width">
+    <div class="card-body" style="padding:16px">
+      <div class="gantt-wrap" id="gantt-container"></div>
+    </div>
+  </div>
+  <div class="card full-width" style="margin-top:16px">
+    <div class="card-header"><div class="card-title">📋 Legend</div></div>
+    <div class="card-body">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:40px;height:12px;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:3px"></div><span style="font-size:12px;color:var(--text-mid)">On Track (Green)</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:40px;height:12px;background:linear-gradient(90deg,#f59e0b,#d97706);border-radius:3px"></div><span style="font-size:12px;color:var(--text-mid)">At Risk (Yellow)</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:40px;height:12px;background:linear-gradient(90deg,#9ca3af,#6b7280);border-radius:3px"></div><span style="font-size:12px;color:var(--text-mid)">Not Started (Gray)</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--navy);transform:rotate(45deg)"></div><span style="font-size:12px;color:var(--text-mid)">Milestone Gate</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:2px;height:20px;background:var(--pink)"></div><span style="font-size:12px;color:var(--text-mid)">Today</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WORKSTREAMS VIEW ═══ -->
+<div class="view fade-in" id="view-workstreams">
+  <div class="page-header">
+    <div class="page-title">Workstream Detail</div>
+    <div class="page-subtitle">Click any workstream to inspect tasks, assignees, and status updates</div>
+  </div>
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <input class="search-input" id="ws-search" type="text" placeholder="Search activities..." onkeyup="filterWSTable()">
+    </div>
+    <select class="filter-select" id="ws-filter-health" onchange="filterWSTable()">
+      <option value="all">All Health</option>
+      <option value="Green">Green</option>
+      <option value="Yellow">Yellow</option>
+      <option value="Gray">Not Started</option>
+    </select>
+    <select class="filter-select" id="ws-filter-stream" onchange="filterWSTable()">
+      <option value="all">All Workstreams</option>
+    </select>
+  </div>
+  <div class="card full-width">
+    <div class="card-body" style="padding:0">
+      <div class="table-wrap">
+        <table id="ws-table">
+          <thead><tr><th>Workstream</th><th>Activity</th><th>Level</th><th>Status</th><th>Health</th><th>Start</th><th>End</th><th>Assigned To</th></tr></thead>
+          <tbody id="ws-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SYSTEMS VIEW ═══ -->
+<div class="view fade-in" id="view-systems">
+  <div class="page-header">
+    <div class="page-title">Systems Roadmap</div>
+    <div class="page-subtitle">Technology build plan by function — phased from Requirements through Hypercare</div>
+  </div>
+  <div class="card full-width">
+    <div class="card-header">
+      <div class="card-title">Phase Legend</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:16px;height:10px;background:#dbeafe;border-radius:2px;display:inline-block"></span>Requirements</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:16px;height:10px;background:#fce7f3;border-radius:2px;display:inline-block"></span>Selection</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:16px;height:10px;background:#fef3c7;border-radius:2px;display:inline-block"></span>Contracting</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:16px;height:10px;background:#3b82f6;border-radius:2px;display:inline-block"></span>Implementation</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:16px;height:10px;background:#22c55e;border-radius:2px;display:inline-block"></span>Hypercare</span>
+      </div>
+    </div>
+    <div class="card-body" style="padding:16px">
+      <div class="sysmap-wrap">
+        <div class="sysmap-grid" id="sysmap"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RISKS VIEW ═══ -->
+<div class="view fade-in" id="view-risks">
+  <div class="page-header">
+    <div class="page-title">Risk Registry</div>
+    <div class="page-subtitle">Cross-functional risks, blockers, and interdependencies requiring leadership attention</div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterRisk('all',this)">All Risks</button>
+    <button class="filter-btn" onclick="filterRisk('high',this)">🔴 High</button>
+    <button class="filter-btn" onclick="filterRisk('medium',this)">🟡 Medium</button>
+    <button class="filter-btn" onclick="filterRisk('low',this)">🟢 Low</button>
+  </div>
+  <div id="risk-list"></div>
+</div>
+
+</main>
+
+<!-- DRILL-DOWN PANEL -->
+<div class="drill-panel" id="drill-panel">
+  <div class="drill-header" id="drill-header">
+    <div>
+      <div class="drill-title" id="drill-title">Workstream</div>
+      <div class="drill-sub" id="drill-sub"></div>
+    </div>
+    <div class="drill-close" onclick="closeDrillPanel()">✕</div>
+  </div>
+  <div class="drill-body" id="drill-body"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Gate Detail</div>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const WORKSTREAMS = [
+  {name:'Regulatory',health:'green',status:'In-Progress',progress:52,tasks:42,atRisk:1,start:'2025-11-18',end:'2027-11-11',owner:'Penny Ng',
+   subs:['Team Build','Regulatory Filing & Submission','Process/Operations','MLR Support']},
+  {name:'Medical Affairs',health:'green',status:'In-Progress',progress:38,tasks:88,atRisk:2,start:'2025-08-09',end:'2028-08-25',owner:'Jennifer Herritz',
+   subs:['Team Build','Medical Strategy','Evidence Generation','Medical Operations','Scientific Communications','KOL Engagement','Congresses']},
+  {name:'Commercial Operations',health:'yellow',status:'In-Progress',progress:29,tasks:110,atRisk:5,start:'2025-08-26',end:'2027-09-30',owner:'MOO',
+   subs:['Team Build','Commercial Insights & Analytics','Market Research','Commercial Data Platform','Digital Technology','Field Enablement / Sales Operations','Marketing Operations']},
+  {name:'Market Access',health:'green',status:'In-Progress',progress:24,tasks:74,atRisk:1,start:'2025-04-01',end:'2028-03-22',owner:'Loreen D.',
+   subs:['Team Build','Field Team Capabilities','Access Strategy','Payer Engagements','State Licensing','Pricing & Contracting','Market Access Operations']},
+  {name:'Sales and Sales Training',health:'green',status:'In-Progress',progress:18,tasks:65,atRisk:2,start:'2025-04-30',end:'2027-11-17',owner:'TBD',
+   subs:['Team Build','Account & Sales Strategy','Field Team Recruiting','Sales Training','Sales Operations','Sales Execution','Enabling Technology']},
+  {name:'Marketing',health:'yellow',status:'In-Progress',progress:22,tasks:82,atRisk:3,start:'2025-07-19',end:'2029-04-19',owner:'MOO',
+   subs:['Team Build','Brand Strategy & Insights','Unbranded/DSE Strategy','Campaigns & Development','Customer Engagement','Speaker Program','Congresses']},
+  {name:'Finance & Accounting',health:'green',status:'In-Progress',progress:45,tasks:48,atRisk:0,start:'2025-08-03',end:'2028-04-13',owner:'CFO Office',
+   subs:['Financial Reporting','Gross to Net','Inventory Cost Accounting','Forecast, Plan & Analyze']},
+  {name:'Information Technology',health:'green',status:'In-Progress',progress:35,tasks:56,atRisk:1,start:'2025-07-17',end:'2027-10-15',owner:'CIO Office',
+   subs:['Infrastructure','Security & Identity','Service Desk','AI & Analytics Foundation']},
+  {name:'Human Resources',health:'yellow',status:'In-Progress',progress:42,tasks:38,atRisk:2,start:'2025-07-30',end:'2027-08-09',owner:'CHRO',
+   subs:['Workforce Planning','Employee Onboarding','Recruiting','Total Rewards Design']},
+  {name:'Legal & Compliance',health:'yellow',status:'In-Progress',progress:31,tasks:44,atRisk:2,start:'2025-07-11',end:'2027-07-30',owner:'General Counsel',
+   subs:['Contract Review & Execution','Contract Management','External Messaging Review','Privacy']},
+  {name:'PV / Drug Safety',health:'green',status:'In-Progress',progress:28,tasks:32,atRisk:0,start:'2025-10-01',end:'2028-01-20',owner:'VP Safety',
+   subs:['Drug Safety Monitoring','AE Adjudication & Reporting','Safety Training','Signal Detection']},
+  {name:'Quality',health:'green',status:'In-Progress',progress:47,tasks:36,atRisk:0,start:'2025-08-03',end:'2027-09-10',owner:'Karen R.',
+   subs:['Culture of Quality','Vendor Qualification','GxP Policies / SOPs','Controlled Document Mgmt']},
+  {name:'Supply Chain',health:'yellow',status:'In-Progress',progress:20,tasks:52,atRisk:3,start:'2025-08-03',end:'2028-09-21',owner:'VP Supply',
+   subs:['Commercial Supply Design','DS/DP CMO Mgmt','Packaging & Labeling','Inventory/Supply Mgmt']},
+  {name:'Patient Advocacy',health:'green',status:'In-Progress',progress:55,tasks:22,atRisk:0,start:'2024-12-09',end:'2027-07-02',owner:'PA Lead',
+   subs:['Patient Advocacy Engagement','Social & Web Presence','Grant Review & Management']},
+];
+
+const MILESTONES = [
+  {id:'topline',label:'Topline Data',date:'2026-08-10',desc:'Pivotal 2L interim analysis data cutoff. Commercial teams to finalize messaging strategy based on data profile.',deps:['Commercial Operations','Medical Affairs','Marketing'],readiness:['Brand messaging finalized','Forecast model updated','MSL field deployment ready']},
+  {id:'bla',label:'BLA Submission',date:'2026-12-31',desc:'BLA filing with FDA planned for Dec 31, 2026. Contingent on positive topline data. Penny Ng is lead. Potential to submit 15-Dec-26.',deps:['Regulatory','Quality','Medical Affairs'],readiness:['CMC sections complete','Clinical module finalized','Labeling strategy aligned']},
+  {id:'acceptance',label:'File Acceptance',date:'2027-03-01',desc:'FDA Day 60 file acceptance. Triggers official PDUFA clock. Brand name conditional acceptance expected by Q1 2027.',deps:['Regulatory','Commercial Operations','Marketing'],readiness:['Brand name approved','AdPromo review operational','MLR process live']},
+  {id:'sales',label:'Sales Team Onboard',date:'2027-06-09',desc:'Full commercial field team onboarded and trained. CRM live, territory alignment complete, IC structure finalized.',deps:['Sales and Sales Training','Commercial Operations','HR'],readiness:['CRM implemented','Territory design finalized','IC administration active','Sales training complete']},
+  {id:'readiness',label:'Launch Readiness',date:'2027-08-01',desc:'Cross-functional launch readiness declaration. All Day 0 capabilities confirmed. Final readiness gate before PDUFA.',deps:['All Workstreams'],readiness:['All systems live','Field team deployed','Payer contracts in place','Patient support hub ready','Day 0 materials approved']},
+  {id:'pdufa',label:'PDUFA Date',date:'2027-09-01',desc:'Target FDA approval date. Commercial launch execution begins immediately upon approval.',deps:['All Workstreams'],readiness:['All capabilities deployed','Launch command center live']},
+];
+
+const TASKS_BY_WS = {
+  'Regulatory': [
+    {name:'BLA Submission',status:'In-Progress',health:'Green',detail:'Potential to submit 15-Dec-26. Contingent on positive topline data.',assigned:'Penny Ng',sub:'Regulatory Filing & Submission'},
+    {name:'FDA Engagement',status:'In-Progress',health:'Green',detail:'CMC PPQ Feedback received 18-Nov. Type C Content meeting granted with WRO expected Feb 2026.',assigned:'Penny Ng',sub:'Regulatory Filing & Submission'},
+    {name:'Inspection Ready',status:'In-Progress',health:'Green',detail:'Quality team aligning with regulatory on inspection readiness checklist.',assigned:'Karen R.',sub:'Regulatory Filing & Submission'},
+    {name:'FDA Submission',status:'Not Started',health:'Gray',detail:'BLA filing planned Dec 31, 2026 with assumption of positive interim data.',assigned:'Penny Ng',sub:'Regulatory Filing & Submission'},
+    {name:'File Acceptance (Day 60)',status:'Not Started',health:'Gray',detail:'Triggered 60 days after FDA submission. Official PDUFA clock starts.',assigned:'—',sub:'Regulatory Filing & Submission'},
+    {name:'Brand Name — Conditional Acceptance',status:'Not Started',health:'Gray',detail:'Submission held until brand name approved by Genmab. Cross-functional workstream needed.',assigned:'—',sub:'Regulatory Filing & Submission',cx:true},
+    {name:'Regulatory Ad/Promo Review',status:'In Progress',health:'Yellow',detail:'Penny following up on 2026 budget implications for AdPromo contractor.',assigned:'Penny Ng',sub:'MLR Support'},
+    {name:'Document Storage',status:'Complete',health:'Green',detail:'Regulatory docs stored in validated TMF and Veeva RIMS. No action needed.',assigned:'Penny Ng',sub:'Process/Operations'},
+    {name:'Submission Publishing',status:'In-Progress',health:'Green',detail:'Publishing CRO handles submissions. Once data available, submission can begin quickly.',assigned:'Penny Ng',sub:'Process/Operations'},
+    {name:'EMA Submission',status:'In-Progress',health:'Green',detail:'EMA submission timeline endorsed at 20-Nov core meeting.',assigned:'Penny Ng',sub:'Other Reg Submissions'},
+    {name:'Additional Contracting / Hiring',status:'In-Progress',health:'Green',detail:'No external support needed for regulatory activities. Internal team sufficient.',assigned:'Penny Ng',sub:'Team Build'},
+    {name:'AdPromo Headcount',status:'Not Started',health:'Gray',detail:'Contractor to be leveraged prior to Genmab integration influence on hiring.',assigned:'—',sub:'Team Build'},
+  ],
+  'Commercial Operations': [
+    {name:'Commercial Data Platform — Vendor Selection',status:'In-Progress',health:'Yellow',detail:'CDW, MDM, and Analytics vendor evaluation underway. RFP decision pending Dec 2025.',assigned:'MOO',sub:'Commercial Data Platform'},
+    {name:'Data Strategy',status:'In-Progress',health:'Yellow',detail:'Commercial data strategy being defined. Evaluating commercial platform vendors.',assigned:'MOO',sub:'Commercial Data Platform'},
+    {name:'Competitive Intelligence',status:'In-Progress',health:'Yellow',detail:'CI monitoring active. ASCO and conference coverage underway.',assigned:'MOO',sub:'Commercial Insights & Analytics'},
+    {name:'Account/HCP Segmentation',status:'In-Progress',health:'Green',detail:'Customer segmentation for Marketing, Market Access, and Sales in progress.',assigned:'MOO',sub:'Field Enablement / Sales Operations'},
+    {name:'IC Strategy and Administration',status:'Not Started',health:'Gray',detail:'IC framework design pending field force sizing completion.',assigned:'MOO',sub:'Field Enablement / Sales Operations'},
+    {name:'Territory Design, Alignment & Sizing',status:'Not Started',health:'Gray',detail:'Dependent on field force sizing and CRM vendor selection.',assigned:'MOO',sub:'Field Enablement / Sales Operations'},
+    {name:'CRM Implementation',status:'Not Started',health:'Gray',detail:'Fully integrated with MDM/CDW/PromoMats. Vendor TBD pending data platform decision.',assigned:'—',sub:'Field Enablement / Sales Operations'},
+    {name:'MLR Operations / PromoMats',status:'In-Progress',health:'Green',detail:'MLR coordinator contractor in place. PromoMats updates ongoing.',assigned:'MOO',sub:'Marketing Operations'},
+    {name:'Master Data — Sales',status:'In-Progress',health:'Yellow',detail:'HCP/HCO master data sourcing and configuration in early stages.',assigned:'MOO',sub:'Digital Technology'},
+    {name:'Commercial Analytics & Reporting',status:'Not Started',health:'Gray',detail:'HQ brand and field analytics build pending CDW implementation.',assigned:'MOO',sub:'Commercial Data Platform'},
+  ],
+  'Medical Affairs': [
+    {name:'KOL Mapping',status:'In-Progress',health:'Green',detail:'KOL universe mapping underway for breast cancer and key conference presence.',assigned:'MA Team',sub:'KOL Engagement'},
+    {name:'Referral Mapping',status:'In-Progress',health:'Green',detail:'Referral pattern and affiliation hierarchy mapping in progress.',assigned:'MA Team',sub:'KOL Engagement'},
+    {name:'Evidence Generation / HEOR',status:'In-Progress',health:'Green',detail:'RACI under definition. Part of Ashfield workstream. Pre-AMCP dossier prep Q1.',assigned:'Jennifer Herritz',sub:'Evidence Generation'},
+    {name:'Publication Planning',status:'In-Progress',health:'Green',detail:'Publication strategy aligned with clinical data readout timeline.',assigned:'MA Team',sub:'Scientific Communications'},
+    {name:'Baseline ATU',status:'In-Progress',health:'Green',detail:'Awareness, trial, and usage baseline study in field.',assigned:'MA Team',sub:'Medical Strategy'},
+    {name:'Medical CRM',status:'Not Started',health:'Gray',detail:'Medical CRM selection pending. Needs to integrate with commercial data platform.',assigned:'—',sub:'Medical Operations'},
+    {name:'MSL Field Deployment',status:'Not Started',health:'Gray',detail:'MSL deployment timeline aligned to topline data readout in Aug 2026.',assigned:'—',sub:'Medical Operations'},
+  ],
+  'Sales and Sales Training': [
+    {name:'Field Team Recruiting',status:'Not Started',health:'Gray',detail:'Regional sales manager and rep recruiting to start Q1 2027.',assigned:'HR/Sales',sub:'Field Team Recruiting'},
+    {name:'Sales Training Program',status:'Not Started',health:'Gray',detail:'Training curriculum under development. Launch readiness cert required.',assigned:'Training Lead',sub:'Sales Training'},
+    {name:'Territory Design',status:'Not Started',health:'Gray',detail:'Dependent on HCP segmentation and CRM availability.',assigned:'MOO',sub:'Sales Operations'},
+    {name:'IC Design',status:'Not Started',health:'Gray',detail:'IC framework to be benchmarked against oncology market standards.',assigned:'MOO',sub:'Sales Operations'},
+    {name:'Account & Sales Strategy',status:'In-Progress',health:'Green',detail:'Account targeting strategy and call planning approach in design.',assigned:'Sales Lead',sub:'Account & Sales Strategy'},
+    {name:'Sales Execution Planning',status:'Not Started',health:'Gray',detail:'Day 1 execution planning and launch meeting structure TBD.',assigned:'—',sub:'Sales Execution'},
+  ],
+  'Market Access': [
+    {name:'Access Strategy',status:'In-Progress',health:'Green',detail:'Market access strategy and payer value proposition under development.',assigned:'Loreen D.',sub:'Access Strategy'},
+    {name:'Payer Value Prop & Message Testing',status:'In-Progress',health:'Green',detail:'Payer value prop messaging being tested and refined.',assigned:'Market Access',sub:'Access Strategy'},
+    {name:'State Licensing',status:'Not Started',health:'Gray',detail:'State-level licensing requirements being cataloged.',assigned:'Legal',sub:'State Licensing'},
+    {name:'Payer Contracting',status:'Not Started',health:'Gray',detail:'Payer contracting strategy and timeline TBD.',assigned:'—',sub:'Pricing & Contracting'},
+    {name:'Government Price Reporting',status:'Not Started',health:'Gray',detail:'Gross to net and government price reporting setup pending.',assigned:'Finance',sub:'Market Access Operations'},
+    {name:'Team Build (Genmab Owned)',status:'Genmab Owned',health:'gray',detail:'Hiring for Market Access team is Genmab integration-dependent.',assigned:'Genmab',sub:'Team Build'},
+  ],
+};
+
+const RISKS = [
+  {id:1,level:'high',ws:'Commercial Operations',name:'CDW/CRM Vendor Decision Delay',desc:'Commercial data platform vendor has not been selected. This delays territory design, IC setup, CRM implementation, and field reporting. Critical path risk with 3+ downstream dependencies.',mitigation:'Accelerate RFP process; establish interim decision gate by June 2026. Escalate to executive sponsor.',owner:'MOO',gate:'Sales Onboard'},
+  {id:2,level:'high',ws:'Regulatory',name:'Brand Name Approval — Genmab Dependency',desc:'BLA submission is on hold pending Genmab brand name approval. Workstream alignment between Regulatory, Commercial, and Marketing required urgently.',mitigation:'Establish cross-functional workstream; schedule Genmab joint decision meeting in Q2 2026.',owner:'Penny Ng',gate:'File Acceptance'},
+  {id:3,level:'medium',ws:'Marketing',name:'Messaging Not Locked Pre-BLA',desc:'Brand and promotional messaging not finalized. MLR review cycle timeline at risk if messaging is delayed into H2 2026.',mitigation:'Align on messaging milestone by Topline Data gate (Aug 2026). Lock key messages before BLA submission.',owner:'MOO',gate:'BLA Submission'},
+  {id:4,level:'medium',ws:'Human Resources',name:'Commercial Hiring Cadence',desc:'Field force hire plan not yet defined. Recruiting lead time for oncology sales reps is 4–6 months. Risk of insufficient runway before Sales Team Onboard gate.',mitigation:'Finalize field force sizing by Q3 2026. Initiate recruiter engagement by Q4 2026.',owner:'CHRO',gate:'Sales Onboard'},
+  {id:5,level:'medium',ws:'Market Access',name:'Genmab Integration — Market Access Team Build',desc:'Market Access team build classified as Genmab-owned. Unclear timeline and integration dependencies. Risk of gap in payer engagement capability pre-launch.',mitigation:'Establish governance on Market Access team roles, reporting, and timelines. Weekly joint update with Genmab counterpart.',owner:'Loreen D.',gate:'Launch Readiness'},
+  {id:6,level:'medium',ws:'Supply Chain',name:'Commercial Supply Readiness',desc:'Commercial supply chain build and 3PL selection not started. Long lead-time activities (serialization, packaging, distribution) require early initiation.',mitigation:'Initiate 3PL RFP by Q3 2026. Align supply chain build with PDUFA planning.',owner:'VP Supply',gate:'Launch Readiness'},
+  {id:7,level:'low',ws:'Medical Affairs',name:'HEOR/Evidence Generation RACI Gap',desc:'Responsibility for HEOR work has not been formally allocated between Medical Affairs and the Ashfield workstream. Risk of duplication or gaps in evidence generation.',mitigation:'Define RACI at next Medical Affairs planning session. Jennifer Herritz to own alignment.',owner:'Jennifer Herritz',gate:'Topline Data'},
+  {id:8,level:'low',ws:'Legal & Compliance',name:'OUS Regulatory Strategy Not Aligned',desc:'EMA and OUS strategy (ex-US submissions) not yet finalized. Filing strategy decision based on data readout still pending.',mitigation:'Schedule OUS regulatory strategy session in Q2 2026. Include filing decision criteria.',owner:'Penny Ng',gate:'BLA Submission'},
+];
+
+const SYSTEMS = [
+  {func:'Medical Affairs',sys:'KOL Database',phases:[{q:0,type:'req'},{q:1,type:'sel'},{q:1,type:'con'},{q:2,type:'imp'},{q:3,type:'hyp'}]},
+  {func:'Medical Affairs',sys:'Medical CRM',phases:[{q:1,type:'req'},{q:2,type:'sel'},{q:3,type:'imp'},{q:4,type:'imp'},{q:5,type:'hyp'}]},
+  {func:'Medical Affairs',sys:'MedComms Platform',phases:[{q:0,type:'req'},{q:1,type:'imp'},{q:2,type:'hyp'}]},
+  {func:'Medical Affairs',sys:'Med Affairs Analytics',phases:[{q:3,type:'req'},{q:4,type:'sel'},{q:5,type:'imp'},{q:6,type:'hyp'}]},
+  {func:'Market Access',sys:'3PL / SP Data',phases:[{q:2,type:'req'},{q:3,type:'sel'},{q:4,type:'con'},{q:5,type:'imp'},{q:6,type:'hyp'}]},
+  {func:'Market Access',sys:'Market Access CRM',phases:[{q:2,type:'req'},{q:3,type:'sel'},{q:4,type:'imp'},{q:5,type:'imp'},{q:6,type:'hyp'}]},
+  {func:'Market Access',sys:'Gov\'t Price Reporting',phases:[{q:4,type:'req'},{q:5,type:'sel'},{q:6,type:'con'},{q:7,type:'imp'}]},
+  {func:'Market Access',sys:'Payer Reference Data',phases:[{q:3,type:'req'},{q:4,type:'imp'},{q:5,type:'hyp'}]},
+  {func:'Comm Ops',sys:'Commercial CDW',phases:[{q:1,type:'req'},{q:2,type:'sel'},{q:3,type:'con'},{q:4,type:'imp'},{q:5,type:'imp'},{q:6,type:'hyp'}]},
+  {func:'Comm Ops',sys:'MDM',phases:[{q:2,type:'req'},{q:3,type:'sel'},{q:4,type:'imp'},{q:5,type:'imp'},{q:6,type:'hyp'}]},
+  {func:'Comm Ops',sys:'Field CRM',phases:[{q:3,type:'req'},{q:4,type:'sel'},{q:5,type:'imp'},{q:6,type:'imp'},{q:7,type:'hyp'}]},
+  {func:'Comm Ops',sys:'IC Admin',phases:[{q:4,type:'req'},{q:5,type:'sel'},{q:6,type:'imp'},{q:7,type:'hyp'}]},
+  {func:'Comm Ops',sys:'PromoMats / MLR',phases:[{q:0,type:'imp'},{q:1,type:'hyp'}]},
+  {func:'Sales',sys:'Sales LMS',phases:[{q:4,type:'req'},{q:5,type:'sel'},{q:6,type:'imp'},{q:7,type:'hyp'}]},
+  {func:'Sales',sys:'Territory Alignment',phases:[{q:4,type:'req'},{q:5,type:'imp'},{q:6,type:'hyp'}]},
+  {func:'Quality',sys:'QMS',phases:[{q:0,type:'imp'},{q:1,type:'hyp'}]},
+  {func:'Quality',sys:'GxP Doc Mgmt',phases:[{q:0,type:'hyp'}]},
+  {func:'Regulatory',sys:'Veeva RIM',phases:[{q:0,type:'hyp'}]},
+  {func:'Regulatory',sys:'Submission Publishing',phases:[{q:2,type:'imp'},{q:3,type:'hyp'}]},
+];
+
+// Quarters: Q3'25 Q4'25 Q1'26 Q2'26 Q3'26 Q4'26 Q1'27 Q2'27 Q3'27
+const QUARTERS = ['Q3 \'25','Q4 \'25','Q1 \'26','Q2 \'26','Q3 \'26','Q4 \'26','Q1 \'27','Q2 \'27'];
+
+// ─────────────────────────────────────────────
+// VIEW ROUTING
+// ─────────────────────────────────────────────
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item[id^="nav-"]').forEach(el=>el.classList.remove('active'));
+  const el = document.getElementById('view-'+v);
+  if(el){el.classList.add('active'); el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in');}
+  const nav = document.getElementById('nav-'+v);
+  if(nav) nav.classList.add('active');
+  if(v==='workstreams') renderWSTable();
+  if(v==='systems') renderSysmap();
+  if(v==='risks') renderRisks();
+  if(v==='timeline') renderGantt();
+  if(v==='dashboard') renderDashboard();
+}
+
+// ─────────────────────────────────────────────
+// DASHBOARD
+// ─────────────────────────────────────────────
+function renderDashboard(){
+  // Days to PDUFA
+  const pdufa = new Date('2027-09-01');
+  const now = new Date('2026-04-17');
+  const days = Math.round((pdufa-now)/(1000*60*60*24));
+  document.getElementById('days-to-pdufa').textContent = days;
+
+  // Health bars
+  const hb = document.getElementById('health-bars');
+  hb.innerHTML = '';
+  WORKSTREAMS.forEach(ws=>{
+    const color = ws.health==='green'?'var(--green)':ws.health==='yellow'?'var(--yellow)':'var(--gray)';
+    hb.innerHTML += `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer" onclick="showWorkstream('${ws.name}')">
+        <div style="width:120px;font-size:11px;color:var(--text-mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0">${ws.name}</div>
+        <div style="flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden">
+          <div style="width:${ws.progress}%;height:100%;background:${color};border-radius:4px;transition:width .8s"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-light);width:30px;text-align:right">${ws.progress}%</div>
+        <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div>
+      </div>`;
+  });
+
+  // WS Grid
+  renderWSGrid('all');
+}
+
+function renderWSGrid(filter='all'){
+  const grid = document.getElementById('ws-grid');
+  grid.innerHTML = '';
+  WORKSTREAMS.forEach(ws=>{
+    if(filter!=='all' && ws.health!==filter) return;
+    const color = ws.health==='green'?'var(--green)':ws.health==='yellow'?'var(--yellow)':'var(--gray)';
+    const atRiskHtml = ws.atRisk>0?`<span class="badge yellow">${ws.atRisk} at risk</span>`:`<span class="badge green">On track</span>`;
+    grid.innerHTML += `
+      <div class="ws-card" onclick="showWorkstream('${ws.name}')">
+        <div class="ws-card-name">${ws.name}</div>
+        <div class="ws-progress-bar"><div class="ws-progress-fill" style="width:${ws.progress}%;background:${color}"></div></div>
+        <div class="ws-card-footer">
+          <div class="ws-health-dot ${ws.health}"></div>
+          ${atRiskHtml}
+          <div class="ws-task-count">${ws.tasks} items</div>
+        </div>
+      </div>`;
+  });
+}
+
+function filterWS(f,btn){
+  document.querySelectorAll('.card .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderWSGrid(f);
+}
+
+// ─────────────────────────────────────────────
+// GANTT
+// ─────────────────────────────────────────────
+const GANTT_START = new Date('2025-07-01');
+const GANTT_END   = new Date('2027-12-01');
+const GANTT_SPAN  = GANTT_END - GANTT_START;
+let ganttDetail = false;
+
+function pct(dateStr){
+  if(!dateStr) return 0;
+  const d = new Date(dateStr);
+  return Math.max(0,Math.min(100,((d-GANTT_START)/GANTT_SPAN)*100));
+}
+
+function renderGantt(){
+  const c = document.getElementById('gantt-container');
+  const months = [];
+  let d = new Date(GANTT_START);
+  while(d<GANTT_END){months.push(d.toLocaleString('en',{month:'short',year:'2-digit'}));d=new Date(d.setMonth(d.getMonth()+1));}
+  
+  const milestoneMarkers = MILESTONES.map(m=>({label:m.label,date:m.date,pct:pct(m.date)}));
+  const todayPct = pct('2026-04-17');
+
+  let html = `<div style="min-width:800px">`;
+  // Month headers
+  html += `<div style="display:flex;margin-left:200px;border-bottom:2px solid var(--border);padding-bottom:6px;margin-bottom:4px">`;
+  months.forEach(m=>{html+=`<div style="flex:1;font-size:9px;font-weight:700;color:var(--text-light);text-align:center;border-right:1px dashed var(--border)">${m}</div>`;});
+  html += `</div>`;
+
+  // Milestone labels
+  html += `<div style="position:relative;margin-left:200px;height:28px;margin-bottom:8px">`;
+  milestoneMarkers.forEach(m=>{
+    html+=`<div style="position:absolute;left:calc(${m.pct}% - 6px);top:0" title="${m.label}: ${m.date}">
+      <div style="width:12px;height:12px;background:var(--navy);transform:rotate(45deg);cursor:pointer" onclick="openMilestoneModal('${MILESTONES.find(x=>x.label===m.label)?.id||''}')"></div>
+      <div style="font-size:8px;color:var(--navy);font-weight:700;white-space:nowrap;transform:translateX(-50%);margin-left:6px;margin-top:2px">${m.label.split(' ')[0]}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // Rows
+  WORKSTREAMS.forEach(ws=>{
+    const color = ws.health==='green'?'green':ws.health==='yellow'?'yellow':'gray';
+    const left = pct(ws.start);
+    const right = pct(ws.end);
+    const width = right-left;
+    html+=`<div style="display:flex;align-items:center;border-bottom:1px solid var(--border);padding:4px 0;min-height:30px" class="gantt-row-parent">
+      <div style="width:200px;flex-shrink:0;font-size:11px;font-weight:700;color:var(--text-dark);padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer" onclick="showWorkstream('${ws.name}')" title="${ws.name}">${ws.name}</div>
+      <div style="flex:1;position:relative;height:20px">
+        <div style="position:absolute;left:0;right:0;top:9px;height:2px;background:var(--border)"></div>
+        <div style="position:absolute;left:${todayPct}%;top:0;bottom:0;width:2px;background:var(--pink);z-index:5"></div>
+        ${milestoneMarkers.map(m=>`<div style="position:absolute;left:calc(${m.pct}% - 1px);top:0;bottom:0;width:1px;background:rgba(2,4,52,0.1);z-index:1"></div>`).join('')}
+        <div class="gantt-bar ${color}" style="left:${left}%;width:${Math.max(1,width)}%;cursor:pointer" onclick="showWorkstream('${ws.name}')" title="${ws.name}: ${ws.start} – ${ws.end}"></div>
+        <div style="position:absolute;left:${todayPct}%;top:-14px;font-size:8px;color:var(--pink);font-weight:700;transform:translateX(-50%);white-space:nowrap;pointer-events:none;display:${todayPct>2&&todayPct<98?'block':'none'}">Today</div>
+      </div>
+    </div>`;
+    if(ganttDetail){
+      ws.subs.forEach(sub=>{
+        const fakeStart = pct(ws.start)+2;
+        const fakeEnd = Math.min(100,pct(ws.end)-5);
+        html+=`<div style="display:flex;align-items:center;border-bottom:1px solid var(--border);padding:3px 0;min-height:24px;background:rgba(237,240,250,0.4)">
+          <div style="width:200px;flex-shrink:0;font-size:10px;color:var(--text-mid);padding-left:20px;padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>
+          <div style="flex:1;position:relative;height:16px">
+            <div class="gantt-bar ${color}" style="left:${fakeStart}%;width:${Math.max(1,fakeEnd-fakeStart)*0.7}%;height:10px;top:3px;opacity:0.6"></div>
+          </div>
+        </div>`;
+      });
+    }
+  });
+
+  html += `</div>`;
+  c.innerHTML = html;
+}
+
+function toggleGanttDetail(){ganttDetail=!ganttDetail;renderGantt();}
+function filterGanttWS(v){
+  // Simple: re-render with filter
+  renderGantt();
+}
+
+// ─────────────────────────────────────────────
+// WORKSTREAM TABLE
+// ─────────────────────────────────────────────
+const ALL_ROWS = [];
+(()=>{
+  WORKSTREAMS.forEach(ws=>{
+    const tasks = TASKS_BY_WS[ws.name]||[];
+    tasks.forEach(t=>{
+      ALL_ROWS.push({ws:ws.name,name:t.name,level:t.sub||'—',status:t.status,health:t.health,assigned:t.assigned,detail:t.detail,sub:t.sub,cx:t.cx});
+    });
+  });
+  // Populate WS filter
+  const sel = document.getElementById('ws-filter-stream');
+  if(sel){
+    WORKSTREAMS.forEach(ws=>{sel.innerHTML+=`<option value="${ws.name}">${ws.name}</option>`;});
+  }
+})();
+
+function renderWSTable(){
+  const q = (document.getElementById('ws-search')||{}).value?.toLowerCase()||'';
+  const fh = (document.getElementById('ws-filter-health')||{}).value||'all';
+  const fs = (document.getElementById('ws-filter-stream')||{}).value||'all';
+  const tbody = document.getElementById('ws-tbody');
+  tbody.innerHTML='';
+  ALL_ROWS.forEach(r=>{
+    if(q&&!r.name.toLowerCase().includes(q)&&!r.ws.toLowerCase().includes(q)) return;
+    if(fh!=='all'&&(!r.health||!r.health.toLowerCase().includes(fh.toLowerCase()))) return;
+    if(fs!=='all'&&r.ws!==fs) return;
+    const color = !r.health?'gray':r.health.toLowerCase()==='green'?'green':r.health.toLowerCase()==='yellow'||r.health.toLowerCase()==='in progress'?'yellow':'gray';
+    tbody.innerHTML+=`<tr class="clickable" onclick="showWorkstream('${r.ws}')">
+      <td><span class="td-tag">${r.ws}</span></td>
+      <td class="td-activity">${r.name}${r.cx?'<span class="badge yellow" style="margin-left:6px">Cross-Functional</span>':''}</td>
+      <td class="td-light" style="font-size:11px">${r.sub||'—'}</td>
+      <td><span class="badge ${color}">${r.status||'—'}</span></td>
+      <td><span class="badge ${color}">${r.health||'—'}</span></td>
+      <td class="td-light" style="font-size:11px">—</td>
+      <td class="td-light" style="font-size:11px">—</td>
+      <td class="td-light" style="font-size:11px">${r.assigned||'—'}</td>
+    </tr>`;
+  });
+}
+function filterWSTable(){renderWSTable();}
+
+// ─────────────────────────────────────────────
+// SYSTEMS ROADMAP
+// ─────────────────────────────────────────────
+function renderSysmap(){
+  const sm = document.getElementById('sysmap');
+  let html = `<div style="display:flex;align-items:center;border-bottom:2px solid var(--border);padding-bottom:8px;margin-bottom:8px">
+    <div style="width:120px;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-light)">FUNCTION</div>
+    <div style="width:160px;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-light)">SYSTEM</div>
+    <div style="flex:1;display:grid;grid-template-columns:repeat(8,1fr)">
+      ${QUARTERS.map(q=>`<div style="font-size:9px;font-weight:700;text-align:center;color:var(--text-light);border-right:1px solid var(--border);padding:4px 2px">${q}</div>`).join('')}
+    </div>
+  </div>`;
+
+  // Milestone overlays: Q2'26=q3, Q4'26=q5, Q2'27=q7
+  const milestoneQs = {3:'Topline',5:'BLA',7:'Sales OB'};
+
+  // Group by function
+  const funcs = [...new Set(SYSTEMS.map(s=>s.func))];
+  funcs.forEach(func=>{
+    const sys = SYSTEMS.filter(s=>s.func===func);
+    sys.forEach((s,i)=>{
+      const cells = Array(8).fill('');
+      s.phases.forEach(p=>{
+        if(p.q<8) cells[p.q]=p.type;
+      });
+      html+=`<div style="display:flex;align-items:center;border-bottom:1px solid var(--border);padding:3px 0;min-height:30px">
+        <div style="width:120px;flex-shrink:0;font-size:11px;font-weight:${i===0?'700':'400'};color:${i===0?'var(--navy)':'var(--text-mid)'};padding:2px 4px">${i===0?func:''}</div>
+        <div style="width:160px;flex-shrink:0;font-size:11px;color:var(--text-dark);padding:2px 4px">${s.sys}</div>
+        <div style="flex:1;display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:3px 0;position:relative">
+          ${cells.map((c,qi)=>{
+            const mLabel = milestoneQs[qi]?`<div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--navy);opacity:.25;transform:translateX(-50%)" title="${milestoneQs[qi]}"></div>`:'';
+            return `<div style="position:relative">
+              ${mLabel}
+              <div class="sysmap-cell ${c}" style="cursor:${c?'pointer':'default'}" title="${c?['req→Requirements','sel→Selection','con→Contracting','imp→Implementation','hyp→Hypercare'].find(x=>x.startsWith(c))?.split('→')[1]:''}"></div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+  });
+
+  // Milestone legend
+  html+=`<div style="display:flex;gap:20px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+    ${Object.entries(milestoneQs).map(([q,l])=>`<div style="display:flex;align-items:center;gap:6px"><div style="width:2px;height:20px;background:var(--navy);opacity:.4"></div><span style="font-size:11px;color:var(--text-mid);font-weight:600">${l} Gate</span></div>`).join('')}
+  </div>`;
+
+  sm.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// RISKS
+// ─────────────────────────────────────────────
+let currentRiskFilter = 'all';
+function renderRisks(){
+  const container = document.getElementById('risk-list');
+  container.innerHTML = '';
+  RISKS.filter(r=>currentRiskFilter==='all'||r.level===currentRiskFilter).forEach(r=>{
+    const levelColor = r.level==='high'?'high':r.level==='medium'?'medium':'low';
+    const levelLabel = r.level==='high'?'🔴 High':r.level==='medium'?'🟡 Medium':'🟢 Low';
+    container.innerHTML+=`<div class="risk-item ${levelColor}" onclick="openRiskModal(${r.id})">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div>
+          <div class="risk-name">${r.name}</div>
+          <div class="risk-ws">${r.ws} · Gate: ${r.gate}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="badge ${r.level==='high'?'red':r.level==='medium'?'yellow':'green'}">${levelLabel}</span>
+          <span style="font-size:10px;color:var(--text-light)">Owner: ${r.owner}</span>
+        </div>
+      </div>
+      <div class="risk-desc">${r.desc}</div>
+    </div>`;
+  });
+}
+
+function filterRisk(f,btn){
+  currentRiskFilter=f;
+  document.querySelectorAll('#view-risks .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRisks();
+}
+
+function openRiskModal(id){
+  const r = RISKS.find(x=>x.id===id);
+  if(!r) return;
+  document.getElementById('modal-title').textContent = r.name;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-field"><div class="modal-field-label">Workstream</div><div class="modal-field-value"><span class="badge ${r.level==='high'?'red':r.level==='medium'?'yellow':'green'}">${r.ws}</span></div></div>
+    <div class="modal-field"><div class="modal-field-label">Risk Level</div><div class="modal-field-value"><span class="badge ${r.level==='high'?'red':r.level==='medium'?'yellow':'green'}">${r.level==='high'?'🔴 High':r.level==='medium'?'🟡 Medium':'🟢 Low'}</span></div></div>
+    <div class="modal-field"><div class="modal-field-label">Gate at Risk</div><div class="modal-field-value">${r.gate}</div></div>
+    <div class="modal-divider"></div>
+    <div class="modal-field"><div class="modal-field-label">Description</div><div class="modal-field-value">${r.desc}</div></div>
+    <div class="modal-field"><div class="modal-field-label">Mitigation Plan</div><div class="modal-field-value" style="background:var(--green-light);padding:10px;border-radius:6px;color:#166534">${r.mitigation}</div></div>
+    <div class="modal-field"><div class="modal-field-label">Owner</div><div class="modal-field-value">${r.owner}</div></div>`;
+  openModal();
+}
+
+// ─────────────────────────────────────────────
+// DRILL PANEL
+// ─────────────────────────────────────────────
+function showWorkstream(name){
+  const ws = WORKSTREAMS.find(w=>w.name===name);
+  const tasks = TASKS_BY_WS[name]||[];
+  if(!ws) return;
+
+  document.getElementById('drill-title').textContent = name;
+  document.getElementById('drill-sub').textContent = `${ws.status} · ${ws.tasks} initiatives · Owner: ${ws.owner}`;
+
+  const color = ws.health==='green'?'var(--green)':ws.health==='yellow'?'var(--yellow)':'var(--gray)';
+  const complete = Math.round(ws.progress);
+  const notStart = tasks.filter(t=>t.status==='Not Started').length;
+  const inProg = tasks.filter(t=>t.status&&t.status.includes('Progress')).length;
+  const done = tasks.filter(t=>t.status==='Complete').length;
+
+  // Group tasks by sub
+  const bySub = {};
+  tasks.forEach(t=>{
+    const k = t.sub||'Other';
+    if(!bySub[k]) bySub[k]=[];
+    bySub[k].push(t);
+  });
+
+  let html = `
+    <div style="background:linear-gradient(135deg,${ws.health==='green'?'#f0fdf4':ws.health==='yellow'?'#fffbeb':'#f9fafb'},#fff);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span class="badge ${ws.health}">${ws.health==='green'?'✅ On Track':ws.health==='yellow'?'⚠️ At Risk':'⬜ Not Started'}</span>
+        <span style="font-size:11px;color:var(--text-light)">${ws.start} – ${ws.end}</span>
+      </div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:8px">
+        <div style="width:${complete}%;height:100%;background:${color};border-radius:4px"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);text-align:right">${complete}% complete</div>
+    </div>
+
+    <div class="drill-stat-row">
+      <div class="drill-stat"><div class="drill-stat-val">${ws.tasks}</div><div class="drill-stat-lbl">Total Items</div></div>
+      <div class="drill-stat"><div class="drill-stat-val" style="color:var(--yellow)">${ws.atRisk}</div><div class="drill-stat-lbl">At Risk</div></div>
+      <div class="drill-stat"><div class="drill-stat-val">${ws.subs.length}</div><div class="drill-stat-lbl">Sub-workstreams</div></div>
+    </div>
+
+    <div class="drill-section">
+      <div class="drill-section-title">Sub-Workstreams</div>
+      ${ws.subs.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:pointer;background:#fff" onclick="filterWSBySubDrill('${name}','${s}')">
+        <div style="font-size:12px;font-weight:600;color:var(--text-dark);flex:1">${s}</div>
+        <div style="font-size:11px;color:var(--text-light)">${(bySub[s]||[]).length} items</div>
+        <div style="font-size:11px;color:var(--pink)">›</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="drill-section">
+      <div class="drill-section-title">Active Tasks</div>
+      ${tasks.slice(0,8).map(t=>{
+        const tc = !t.health?'gray':t.health.toLowerCase()==='green'?'green':t.health.toLowerCase().includes('yellow')||t.health.toLowerCase()==='in progress'?'yellow':'gray';
+        return `<div class="drill-task" onclick="openTaskModal('${name}','${t.name.replace(/'/g,"\\'")}')">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div class="drill-task-name">${t.name}</div>
+            <span class="badge ${tc}" style="margin-left:8px;flex-shrink:0">${t.status||'—'}</span>
+          </div>
+          <div class="drill-task-meta">
+            <span style="font-size:10px;background:var(--lavender);color:var(--text-mid);padding:2px 6px;border-radius:3px">${t.sub}</span>
+            ${t.assigned&&t.assigned!=='—'?`<span class="drill-assignee">👤 ${t.assigned}</span>`:''}
+            ${t.cx?'<span class="badge yellow" style="font-size:9px">Cross-Func</span>':''}
+          </div>
+          ${t.detail?`<div class="drill-task-detail">${t.detail}</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  document.getElementById('drill-body').innerHTML = html;
+  document.getElementById('drill-panel').classList.add('open');
+}
+
+function closeDrillPanel(){
+  document.getElementById('drill-panel').classList.remove('open');
+}
+
+function openTaskModal(wsName,taskName){
+  const tasks = TASKS_BY_WS[wsName]||[];
+  const t = tasks.find(x=>x.name===taskName);
+  if(!t) return;
+  const tc = !t.health?'gray':t.health.toLowerCase()==='green'?'green':t.health.toLowerCase().includes('yellow')?'yellow':'gray';
+  document.getElementById('modal-title').textContent = t.name;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-field"><div class="modal-field-label">Workstream</div><div class="modal-field-value"><span class="badge navy">${wsName}</span></div></div>
+    <div class="modal-field"><div class="modal-field-label">Sub-Workstream</div><div class="modal-field-value">${t.sub}</div></div>
+    <div class="modal-field"><div class="modal-field-label">Status</div><div class="modal-field-value"><span class="badge ${tc}">${t.status||'—'}</span></div></div>
+    <div class="modal-field"><div class="modal-field-label">Health</div><div class="modal-field-value"><span class="badge ${tc}">${t.health||'—'}</span></div></div>
+    <div class="modal-divider"></div>
+    <div class="modal-field"><div class="modal-field-label">Current Period Detail</div><div class="modal-field-value">${t.detail||'No update provided.'}</div></div>
+    <div class="modal-field"><div class="modal-field-label">Assigned To</div><div class="modal-field-value">${t.assigned||'—'}</div></div>
+    ${t.cx?`<div class="modal-field"><div class="modal-field-label">Note</div><div class="modal-field-value" style="background:var(--yellow-light);padding:10px;border-radius:6px;color:#92400e">⚠️ This item has cross-functional dependencies. Ensure all stakeholders are aligned.</div></div>`:''}`;
+  openModal();
+}
+
+// ─────────────────────────────────────────────
+// MILESTONE MODAL
+// ─────────────────────────────────────────────
+function openMilestoneModal(id){
+  const m = MILESTONES.find(x=>x.id===id);
+  if(!m) return;
+  const now = new Date('2026-04-17');
+  const target = new Date(m.date);
+  const days = Math.round((target-now)/(1000*60*60*24));
+  document.getElementById('modal-title').textContent = '🚩 ' + m.label;
+  document.getElementById('modal-body').innerHTML=`
+    <div style="display:flex;gap:12px;margin-bottom:16px">
+      <div style="flex:1;background:var(--lavender);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:${days<0?'var(--green)':'var(--navy)'}">${days<0?'✓ Past':''+days}</div>
+        <div style="font-size:11px;color:var(--text-light)">${days<0?'Completed':'Days remaining'}</div>
+      </div>
+      <div style="flex:1;background:var(--lavender);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:14px;font-weight:700;color:var(--text-dark)">${m.date}</div>
+        <div style="font-size:11px;color:var(--text-light)">Target Date</div>
+      </div>
+    </div>
+    <div class="modal-field"><div class="modal-field-label">Description</div><div class="modal-field-value">${m.desc}</div></div>
+    <div class="modal-divider"></div>
+    <div class="modal-field"><div class="modal-field-label">Workstream Dependencies</div>
+      <div class="modal-field-value">${m.deps.map(d=>`<span class="td-tag" style="margin:2px 4px 2px 0;display:inline-block">${d}</span>`).join('')}</div>
+    </div>
+    <div class="modal-field"><div class="modal-field-label">Readiness Requirements</div>
+      <div>${m.readiness.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-dark)">
+        <span style="color:var(--text-light)">◦</span>${r}
+      </div>`).join('')}</div>
+    </div>`;
+  openModal();
+}
+
+// ─────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────
+function openModal(){document.getElementById('modal').classList.add('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  renderDashboard();
+  // Populate WS filter
+  const sel = document.getElementById('ws-filter-stream');
+  if(sel) WORKSTREAMS.forEach(ws=>{sel.innerHTML+=`<option value="${ws.name}">${ws.name}</option>`;});
+});
+</script>
+</body>
+</html>
